@@ -1,0 +1,21 @@
+# use base image.
+FROM ubuntu:18.04
+
+
+#install wget
+RUN apt update
+RUN apt install -y wget
+RUN apt install -y gnupg
+
+#Import Public key
+RUN set -x \
+  && (wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | apt-key add -) \
+  && (echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.2.list) \
+  && apt update \
+  && apt install -y mongodb-org
+
+# create necessary directories.
+WORKDIR ../
+RUN set -x \
+  && mkdir data \
+  && mkdir /data/db

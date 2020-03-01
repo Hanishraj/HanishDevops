@@ -1,0 +1,18 @@
+version: '3'
+services:
+  mongodb:
+    image: mongodb_image:latest 
+    #container_name: mongodb-container1
+    command: "/usr/bin/mongod"
+    hostname: mongo-host
+    #ports:
+     # - "8080:80"
+    #networks:
+      #crm-net:
+        #ipv4_address: 100.1.1.20
+    networks:
+      - crm-net
+networks:
+  crm-net:
+    external:
+            name: crm-net

@@ -1,0 +1,73 @@
+From 
+Ubuntu:18.04
+
+To add the mongo dB Key 
+
+wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
+
+
+for GNUPG
+
+sudo apt-get install gnupg
+
+
+# use base image.
+FROM sloopstash/amazonlinux:v1
+
+# install system packages.
+RUN yum install -y tcl
+
+# download and extract redis.
+WORKDIR /tmp
+RUN set -x \
+  && wget http://download.redis.io/releases/redis-2.8.19.tar.gz --quiet \
+  && tar xvzf redis-2.8.19.tar.gz > /dev/null
+
+# compile and install redis.
+WORKDIR redis-2.8.19
+RUN set -x \
+  && make distclean \
+  && make \
+  && make install
+
+# create necessary directories.
+WORKDIR ../
+RUN set -x \
+  && rm -rf redis-2.8.19* \
+  && mkdir /opt/redis \
+  && mkdir /opt/redis/data \
+  && mkdir /opt/redis/conf \
+  && mkdir /opt/redis/log \
+  && history -c
+
+# set default work directory.
+WORKDIR /opt/redis
+
+
+
+
+Import the public key used by the package management system
+wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
+
+Create a list file for MongoDB
+Create the /etc/apt/sources.list.d/mongodb-org-4.2.list file for Ubuntu 18.04 (Bionic)
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+
+Reload local package database
+sudo apt-get update
+
+Install the MongoDB packages.
+sudo apt-get install -y mongodb-org
+
+
+Directories
+If you installed via the package manager, the data directory /var/lib/mongodb and the log directory /var/log/mongodb are created during the installation.
+
+
+procedure to start:
+1.Start MongoDB
+sudo systemctl start mongod
+
+
+
+sudo docker container run -d -i -t --rm --name crm-redis -h crm-redis --network crm-net --ip 100.1.1.20 -v /opt/kickstart-docker/redis/data:/opt/redis/data -v /opt/kickstart-docker/redis/log:/opt/redis/log -v /opt/kickstart-docker/redis/conf/main.conf:/opt/redis/conf/redis.conf -v /opt/kickstart-docker/supervisor/conf/main.conf:/etc/supervisord.conf -v /opt/kickstart-docker/supervisor/conf/redis.ini:/etc/supervisord.d/redis.ini sloopstash/redis:v1/usr/bin/supervisord -c /etc/supervisord.conf
